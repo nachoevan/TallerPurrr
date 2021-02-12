@@ -1,0 +1,92 @@
+\usepackage{graphicx}
+%\setbeamertemplate{caption}[numbered]
+\usepackage{hyperref}
+%\mode<presentation>
+%\usepackage{amsmath}
+\usepackage{tcolorbox}
+
+\usepackage{color}
+\usepackage{float}
+
+\definecolor{negro}{RGB}{0, 0, 0}
+\definecolor{verdetelecomclaro}{RGB}{251, 255, 172}
+\definecolor{iosOrange}{HTML}{FF9500}
+\definecolor{iosGreen}{HTML}{4cd964}
+\definecolor{iosRed}{HTML}{FF3B30}
+\definecolor{iosPink}{HTML}{FF2D55}
+\definecolor{iosBlue}{HTML}{007AFF}
+\definecolor{iosLBlue}{HTML}{34AADC}
+
+\newfontfamily{\sectionsfont}[Path = ./fonts/,
+Extension = .ttf,
+UprightFont = *-Regular,
+ItalicFont = *-Italic,
+BoldFont = *-Bold]{NotoSerif}
+
+\setbeamertemplate{navigation symbols}{}
+\institute{Department of Political Science}
+\setbeamertemplate{title page}[empty]
+
+\setbeamerfont{frametitle}{family=\bfseries\sectionsfont}
+\setbeamerfont{title}{family=\sectionsfont}
+
+\setbeamerfont{subtitle}{size=\small}
+
+\setbeamertemplate{itemize items}[square]
+
+\setbeamercovered{transparent}
+
+\setbeamercolor{block title}{bg=iosRed!30,fg=black}
+%\setbeamercolor{title}{bg=iosBlue!30, fg = red}
+\setbeamercolor{title}{bg=iosBlue!50!white,fg=black}
+\setbeamercolor{frametitle}{fg=iosBlue,bg=iosLBlue!5!white}
+\setbeamercolor{section in head/foot}{fg=iosLBlue,bg=iosLBlue!5!white}
+\setbeamercolor{structure}{fg=iosRed}
+\setbeamercolor{structure}{fg=iosRed}
+\setbeamercolor{item projected}{bg=iosBlue}
+\setbeamercolor{itemize item}{fg=iosBlue}
+
+\setsansfont[Mapping=tex-text,
+Path = ./fonts/,
+Extension = .ttf,
+ItalicFont = *-Italic,
+UprightFont = *-Regular,
+BoldItalicFont = *-BoldItalic,
+BoldFont = *-Bold]{NotoSans}
+
+\setmonofont[Path = ./fonts/,
+Extension = .ttf,
+UprightFont = *-Regular,
+BoldFont = *-Black]{Inconsolata}
+
+\newtcolorbox{box_naranja}{enhanced,sharp corners,colback=iosOrange!20!white,colframe=iosOrange}
+\newtcolorbox{box_verde}[1]{rightrule=0pt,toprule=0pt, leftrule=0pt,bottomrule=1pt,colback=iosGreen!5!white,colframe=iosGreen!80!black,fonttitle=\sffamily,title=#1}
+\newtcolorbox{box_rosa}[1]{enhanced,sharp corners,drop fuzzy shadow,rightrule=0pt,toprule=0pt, leftrule=0pt,bottomrule=0pt,colback=iosPink!5!white,colframe=iosPink!95!black,fonttitle=\sffamily,title=#1}
+\newtcolorbox{box_roja}[1]{enhanced,sharp corners,drop fuzzy shadow,rightrule=0pt,toprule=0pt, leftrule=0pt,bottomrule=2pt,colback=iosRed!5!white,colframe=iosRed!80!black,fonttitle=\sffamily,title=#1}
+\newtcolorbox{box_azul}[1]{enhanced,sharp corners, drop fuzzy shadow,rightrule=0pt,toprule=0pt, leftrule=0pt,bottomrule=1pt,colback=iosLBlue!5!white, colframe=iosLBlue!80!black,colbacktitle=iosLBlue!80!black,fonttitle=\sffamily,title=#1}
+
+\usepackage{listings}
+\lstdefinestyle{codechunk}{
+	backgroundcolor=\color[HTML]{daf1f5},
+	language=R,
+	showstringspaces=false,
+	basicstyle=\footnotesize\ttfamily,
+	keywordstyle=\bfseries\color[HTML]{90323D},
+	keywordstyle={[2]\color[HTML]{5CB22E}},
+	keywords=[2]{TRUE,FALSE},
+	stringstyle=\color[HTML]{EBA433},
+	alsoletter ={_},
+	otherkeywords={ggplot,geom_ridges,stat_summary,aes,_qq,_line,facet_wrap,fct_reorder,gg,filter,group_by,mutate,quantiles,gg_rf,gg_pt,_sl,bootstrap_anova,summarise,map_int,pivot_longer,seq_along,geom_boxplot,geom_point,geom_hline,geom_vline,stat_smooth,select,geom_jitter,pull,map,tibble,geom_density_ridges,crossing,geom_line,geom_,as.Date,as_tibble,ungroup,kable,pivot_wider,bind_rows,ggAcf,theme,ylab,xlab,sscale_fill_continuous,arrange,unnest_wider},
+	deletekeywords={col,R,names,data,colors,args,residuals,null,_}}
+\lstset{escapechar=\&}
+\lstdefinestyle{output}{
+	backgroundcolor=\color[HTML]{FCFFF7},
+	language=R,
+	basicstyle=\ttfamily}
+
+\AtBeginPart{}
+\AtBeginSection{}
+\AtBeginSubsection{}
+\AtBeginSubsubsection{}
+\setlength{\emergencystretch}{0em}
+\setlength{\parskip}{0pt}

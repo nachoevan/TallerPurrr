@@ -1,0 +1,31 @@
+	\usepackage[utf8]{inputenc}
+	\usepackage[spanish]{babel}
+	\usepackage{graphicx}
+	\usepackage{hyperref}
+	\usepackage{epstopdf}
+	\usepackage{mathrsfs}
+	\usepackage{amsmath, amsthm, amsfonts}
+	\usepackage{listings}
+	\usepackage{xcolor}
+	\topmargin=-1cm
+	\oddsidemargin=0cm
+	\textheight=25cm
+	\textwidth=17cm
+	\DeclareGraphicsExtensions{.bmp,.png,.jpg,.jpeg,.eps}
+\lstdefinestyle{codechunk}{
+backgroundcolor=\color[HTML]{A5E9F8},
+language=R,
+basicstyle=\ttfamily,
+keywordstyle=\bfseries\color[HTML]{484359}}
+
+\lstdefinestyle{output}{
+backgroundcolor=\color[HTML]{FCFFF7},
+language=R,
+basicstyle=\ttfamily}
+
+
+%\newenvironment{Schunk}{}{}
+%\lstnewenvironment{Sinput}{\lstset{style=Rstyle}}{}
+%\lstnewenvironment{Scode}{\lstset{style=Rstyle}}{}
+%\lstnewenvironment{Soutput}{\lstset{style=Routstyle}}{}
+

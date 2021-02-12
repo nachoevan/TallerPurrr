@@ -1,0 +1,118 @@
+---
+title: "\\textbf{Menos for, más purrr}:  \n Programación funcional con R"
+author: "Nacho Evangelista"
+date: "18 de febrero de 2020"
+output: 
+  beamer_presentation:
+    keep_tex: true
+    slide_level: 3
+    latex_engine: xelatex
+    template: template_beamer.tex
+    toc: true
+    theme: "frankfurt"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::knit_hooks$set(source = function(x, options) {
+    paste("\\begin{lstlisting}[style=codechunk]\n", paste(x,collapse = "\n"), 
+      "\n\\end{lstlisting}", sep = '')
+})
+```
+
+# Introducción
+
+## Motivación
+
+### A
+
+- Bullet 1: holis
+- Bullet 2
+- Bullet 3
+
+## Listas en R
+
+### A
+
+# purrr
+
+## La función \texttt{map}
+
+### A
+
+```{r cars, echo = TRUE}
+summary(cars)
+```
+
+## Acomodando el tipo de salida
+
+### A
+
+```{r pressure}
+plot(pressure)
+```
+
+## Funciones anónimas
+
+### A
+
+## Múltiples argumentos
+
+### \texttt{map2}
+
+## dataframes
+
+### Pero yo nunca usé listas...
+
+# purrr + tidyr + dplyr
+
+## \texttt{mutate} + \texttt{purrr}
+
+## Columnas lista y dataframes anidados
+
+### ¿Cómo se construyen?
+
+- Definición:
+- Usando \texttt{nest}
+
+### ¿Por qué necesito purrr?
+
+```{r, eval=FALSE}
+tibble(list_col = list(c(1, 5, 7), 
+                       5, 
+                       c(10, 10, 11))) %>%
+  mutate(list_sum = sum(list_col))
+```
+
+```{r, eval = FALSE}
+tibble(list_col = list(c(1, 5, 7), 
+                       5, 
+                       c(10, 10, 11))) %>%
+  mutate(list_sum = map(list_col, sum))
+```
+
+## Ejemplos
+
+### Secuencia de fechas
+
+### Coeficiente de correlación
+
+### Abrir varios archivos a la vez
+
+### Rotar puntos
+
+### Train/test
+
+### Múltiples plots
+
+# Extra
+
+## Puede fallar...
+
+### \texttt{possibly}
+
+## \texttt{repeat}
+
+# Resumen
+
+### Resumen
