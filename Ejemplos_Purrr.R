@@ -45,6 +45,17 @@ datos %>%
   unnest(luchadores) %>%
   left_join(luchadores, by = c("luchadores" = "codigo"))
 
+tibble::tribble(
+ ~pelea, ~horario,                      ~casting,
+      1,  "20:30",        "thf028,fez195,yfm179",
+      2,  "20:50",               "thf028,yfm179",
+      3,  "19:40", "jfa348,fez195,gky651,wpx281",
+      4,  "21:00",               "thf028,fez195",
+      5,  "19.20",               "phb625,yfm179",
+      6,  "20:10", "yfm179,gsf901,thf028,fez195"
+  )
+
+
 # comentar por qué es necesario el unlist!
 
 # esto

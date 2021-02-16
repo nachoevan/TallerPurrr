@@ -6,23 +6,11 @@
 \usepackage{ifxetex,ifluatex}
 \usepackage{fixltx2e} % provides \textsubscript
 \usepackage{lmodern}
-\ifxetex
+
 \usepackage{fontspec,xltxtra,xunicode}
 \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
 \newcommand{\euro}{€}
-\else
-\ifluatex
-\usepackage{fontspec}
-\defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
-\newcommand{\euro}{€}
-\else
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-$if(euro)$
-\usepackage{eurosym}
-$endif$
-\fi
-\fi
+
 % use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 % use microtype if available
@@ -129,6 +117,7 @@ BoldFont = *-Bold]{NotoSerif}
 \setbeamerfont{subtitle}{size=\small}
 
 \setbeamertemplate{itemize items}[square]
+\setbeamertemplate{enumerate items}[square]
 
 \setbeamercovered{transparent}
 
@@ -154,7 +143,8 @@ BoldFont = *-Bold]{NotoSans}
 \setmonofont[Path = ./fonts/,
 Extension = .ttf,
 UprightFont = *-Regular,
-BoldFont = *-Black]{Inconsolata}
+BoldFont = *-Bold,
+Contextuals=Alternate]{FiraCode}
 
 \newtcolorbox{box_naranja}{enhanced,sharp corners,colback=iosOrange!20!white,colframe=iosOrange}
 \newtcolorbox{box_verde}[1]{rightrule=0pt,toprule=0pt, leftrule=0pt,bottomrule=1pt,colback=iosGreen!5!white,colframe=iosGreen!80!black,fonttitle=\sffamily,title=#1}
@@ -163,11 +153,13 @@ BoldFont = *-Black]{Inconsolata}
 \newtcolorbox{box_azul}[1]{enhanced,sharp corners, drop fuzzy shadow,rightrule=0pt,toprule=0pt, leftrule=0pt,bottomrule=1pt,colback=iosLBlue!5!white, colframe=iosLBlue!80!black,colbacktitle=iosLBlue!80!black,fonttitle=\sffamily,title=#1}
 
 \usepackage{listings}
+\usepackage{lstfiracode}
 \lstdefinestyle{codechunk}{
 	backgroundcolor=\color[HTML]{daf1f5},
 	language=R,
 	showstringspaces=false,
 	basicstyle=\footnotesize\ttfamily,
+	style=FiraCodeStyle,
 	keywordstyle=\bfseries\color[HTML]{90323D},
 	keywordstyle={[2]\color[HTML]{5CB22E}},
 	keywords=[2]{TRUE,FALSE},
@@ -175,7 +167,7 @@ BoldFont = *-Black]{Inconsolata}
 	alsoletter ={_},
 	otherkeywords={ggplot,geom_ridges,stat_summary,aes,_qq,_line,facet_wrap,fct_reorder,gg,filter,group_by,mutate,quantiles,gg_rf,gg_pt,_sl,bootstrap_anova,summarise,map_int,pivot_longer,seq_along,geom_boxplot,geom_point,geom_hline,geom_vline,stat_smooth,select,geom_jitter,pull,map,tibble,geom_density_ridges,crossing,geom_line,geom_,as.Date,as_tibble,ungroup,kable,pivot_wider,bind_rows,ggAcf,theme,ylab,xlab,sscale_fill_continuous,arrange,unnest_wider},
 	deletekeywords={col,R,names,data,colors,args,residuals,null,_}}
-\lstset{escapechar=\&}
+%\lstset{escapechar=\&}
 \lstdefinestyle{output}{
 	backgroundcolor=\color[HTML]{FCFFF7},
 	language=R,

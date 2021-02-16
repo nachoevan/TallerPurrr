@@ -4,7 +4,7 @@ author: "Nacho Evangelista"
 date: "18 de febrero de 2020"
 output: 
   beamer_presentation:
-    keep_tex: true
+    keep_tex: FALSE
     slide_level: 3
     latex_engine: xelatex
     template: template_beamer.tex
@@ -13,12 +13,22 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, results = 'markup', comment="")
 knitr::knit_hooks$set(source = function(x, options) {
     paste("\\begin{lstlisting}[style=codechunk]\n", paste(x,collapse = "\n"), 
       "\n\\end{lstlisting}", sep = '')
 })
+knitr::knit_hooks$set(output = function(x, options) {
+  return(paste("\\small\n\\begin{verbatim}\n", x, "\\end{verbatim}\n\\normalsize", sep = ""))
+})
 ```
+
+```{r}
+library(dplyr)
+library(purrr)
+library(tidyr)
+```
+
 
 # Introducción
 
@@ -26,13 +36,36 @@ knitr::knit_hooks$set(source = function(x, options) {
 
 ### A
 
-- Bullet 1: holis
-- Bullet 2
-- Bullet 3
+
+- Nuestro objetivo: reemplazar los _for loops_ o estructuras de repetición. Los lenguajes de programación puramente funcionales utilizan funciones para lograr los mismos resultados.
+
+- En R base existen las funciones de la familia \texttt{apply}. En el paquete \texttt{purrr}, estas funciones se reemplazan por la familia \texttt{map}, más fáciles de usar. Se llaman funcionales: reciben una función como argumento.
+
+- En una estructura funcional, no es necesario crear una lista vacía para ir guardando resultados, el código es más conciso.
+
+- Premisa: arrancar con porciones de código pequeños y fáciles de entender (funciones). Combinar estos bloques en estructuras más complejas.
+
+- Evitar duplicación de código. La duplicación hace que los errores y _bugs_ sean más frecuentes. También se hace más difícil modificar el código.
+
+- Principio: no repetirse a uno mismo (DRY: _don't repeat yourself_)
+
+- R programmers prefer to solve this type of problem by applying an operation to each element in a vector. This often requires only one line of code, with no appeal to indices.
+
+- Estilo funcional: descomponer un problema grande en partes y resolver cada una de estas partes con una función o combinación de funciones.
+
+- El estilo funcional permite obtener soluciones eficientes y elegantes a problemas modernos
 
 ## Listas en R
 
-### A
+### Listas
+
+- El bloque fundamental de \texttt{purrr} son las listas:
+  - Un vector es un objeto que guarda elementos individuales del mismo tipo
+  - Un dataframe es una estructura que guarda varios vectores de la misma longitud pero de distinto tipo.
+  - Una lista es una estructura que permite guardar objetos de distinto tipo y longitud.
+
+
+- https://cran.r-project.org/web/packages/listviewer/index.html
 
 # purrr
 
@@ -40,21 +73,26 @@ knitr::knit_hooks$set(source = function(x, options) {
 
 ### A
 
-```{r cars, echo = TRUE}
-summary(cars)
-```
+- Muchas operaciones de R simplemente funcionan en forma vectorizada; cuando proveemos vectores como entrada, la función se aplica elemento a elemento (una suerte de iteración)
+
+- Muchas funciones no tienen esa capacidad
+
+- \texttt{purrr} sirve para iterar
+
+- La función (funcional) más básica de \texttt{purrr} es \texttt{map}: toma un vector y una función, y aplica la función a cada elemento del vector, devolviendo los resultados en una lista.
+
+- \texttt{map(1:3,f)} es equivalente a \texttt{list(f(1), f(2), f(3))}
+
 
 ## Acomodando el tipo de salida
 
 ### A
 
-```{r pressure}
-plot(pressure)
-```
 
 ## Funciones anónimas
 
-### A
+### A 
+
 
 ## Múltiples argumentos
 
@@ -70,12 +108,17 @@ plot(pressure)
 
 ## Columnas lista y dataframes anidados
 
+- Some crazy stuff starts happening when you learn that tibble columns can be lists (as opposed to vectors, which is what they usually are).
+
+- For instance, a tibble can be “nested” where the tibble is essentially split into separate data frames based on a grouping variable, and these separate data frames are stored as entries of a list 
+
 ### ¿Cómo se construyen?
 
 - Definición:
 - Usando \texttt{nest}
+- Como resultado de una operación...
 
-### ¿Por qué necesito purrr?
+### ¿Por qué necesito purrr? {.fragile}
 
 ```{r, eval=FALSE}
 tibble(list_col = list(c(1, 5, 7), 
@@ -93,17 +136,149 @@ tibble(list_col = list(c(1, 5, 7),
 
 ## Ejemplos
 
-### Secuencia de fechas
+### Secuencia de fechas {.fragile}
 
-### Coeficiente de correlación
+Contamos con los movimientos de dos empresas. Interesa tener la serie temporal de eventos para cada empresa y producto. 
 
-### Abrir varios archivos a la vez
+```{r ejemplofechas1, echo = TRUE}
+datos <- tibble::tribble(
+  ~empresa, ~producto,       ~fecha, ~evento,
+       "A",      "A1", "02/06/2018",     112,
+       "A",      "A1", "06/06/2018",     141,
+       "A",      "A1", "13/07/2018",     119,
+       "A",      "A2", "01/05/2018",      53,
+       "A",      "A2", "04/05/2018",      67,
+       "B",      "B1", "01/07/2018",     127,
+       "B",      "B1", "05/07/2018",     301,
+       "B",      "B1", "10/07/2018",      98,
+       "B",      "B1", "11/07/2018",     167)
+datos$fecha <- as.Date(datos$fecha,format = "%d/%m/%Y")
+```
+
+###
+
+Idea:
+
+1. Determinar la primera y última fecha de cada grupo
+2. Generar una secuencia de fechas (\texttt{seq.Date}) para cada grupo y construir una tabla con todas las fechas
+3. Unir esta tabla con la original
+
+### {.fragile}
+
+```{r ejemplofechas2, echo = TRUE}
+fechas_todas <- 
+  datos %>%
+  group_by(empresa, producto) %>%
+  summarise(fecha_inicial = min(fecha),
+            fecha_final = max(fecha)) %>%
+  mutate(fechas = map2(fecha_inicial,
+                       fecha_final,
+                       ~seq.Date(.x,.y,by="1 day"))) %>%
+  select(-fecha_inicial,-fecha_final)
+```
+
+### {.fragile}
+
+```{r ejemplofechas3, echo = TRUE}
+fechas_todas %>%
+  unnest(fechas) %>%
+  left_join(datos, by = c("empresa","producto","fechas" = "fecha"))
+```
+
+
+
+
+### Separar datos en filas{.fragile}
+
+```{r ejemplo-separarfilas-1, echo = TRUE}
+peleas <- tibble::tribble(
+ ~pelea, ~horario,                      ~casting,
+      1,  "20:30",        "thf028,fez195,yfm179",
+      2,  "20:50",               "thf028,yfm179",
+      3,  "19:40", "jfa348,fez195,gky651,wpx281",
+      4,  "21:00",               "thf028,fez195",
+      5,  "19.20",               "phb625,yfm179",
+      6,  "20:10", "yfm179,gsf901,thf028,fez195")
+```
+
+```{r ejemplo-separarfilas-2, echo = TRUE}
+luchadores <- tibble::tribble(
+   ~codigo,           ~nombre,
+  "gsf901",  "Vicente Viloni",
+  "thf028",     "Hip Hop Man",
+  "wpx281",         "La Masa",
+  "fez195", "Fulgencio Mejía",
+  "jfa348",        "Mc Floyd",
+  "phb625",     "Mario Morán",
+  "gky651",      "Rulo Verde",
+  "yfm179",    "Steve Murphy")
+```
+
+### Abrir varios archivos a la vez {.fragile}
+
+```{r}
+list.files(pattern=".csv") %>%
+  tibble()
+```
+
 
 ### Rotar puntos
 
-### Train/test
+### Train/test {.fragile}
 
-### Múltiples plots
+```{r}
+data <- mtcars %>% 
+  mutate(fold = rep(1:5,length.out=nrow(.))) %>% 
+  arrange(fold) %>%
+  group_by(fold) %>%
+  nest() %>%
+  mutate(dummy = 1)
+```
+
+```{r}
+train_test <- data %>% 
+  inner_join(data, by="dummy") %>%
+  select(-dummy) %>%
+  filter(fold.y != fold.x) %>%
+  group_by(fold.x) %>%
+  summarise(test = first(data.x),
+            train = list(bind_rows(data.y)))
+```
+
+### Múltiples salidas {.fragile}
+ 
+```{r}
+tibble::tribble(
+               ~banda,                     ~cancion,                                                           ~frase,
+    "Los Wachiturros",          "Este es el pasito",                               "El que no hace palmas es un gato",
+            "La Base",             "Sabor sabrosón",      "Según la moraleja, el que no hace palmas se deja, se deja",
+       "Damas Gratis",           "Me va a extrañar",                          "ATR perro cumbia cajeteala piola gato",
+    "Altos Cumbieros",            "No voy a llorar",       "Andy, fijate que volvieron, quienes… los altos cumbieros",
+  "Los Pibes Chorros", "Llegamos los Pibes Chorros", "Llegamos los pibes chorros queremos las manos de todos arriba…",
+            "La Liga",               "Se re pudrió",                       "El que no hace palmas tiene fama de gato",
+       "Los Palmeras",                    "La cola",    "A la una, a la dos, a la one two three four five seven nine"
+  )
+```
+
+
+### Múltiples plots {.fragile}
+
+```{r}
+tibble::tribble(
+  ~`"x"`, ~`"y"`,
+    211,   184,
+    230,   147,
+    587,   413,
+    414,   252,
+    419,   252,
+    157,   272,
+    327,   158,
+    222,   158,
+    451,   249,
+    296,   127
+  )
+```
+
 
 # Extra
 
