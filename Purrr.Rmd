@@ -1,7 +1,7 @@
 ---
 title: "\\textbf{Menos for, más purrr}:  \n Programación funcional con R"
 author: "Nacho Evangelista"
-date: "18 de febrero de 2020"
+date: "18 de febrero de 2021"
 output: 
   beamer_presentation:
     keep_tex: FALSE
@@ -36,101 +36,374 @@ options(tibble.print_max = 10)
 
 ## Motivación
 
-### A
+### Motivación
 
+\small
 
-- Nuestro objetivo: reemplazar los _for loops_ o estructuras de repetición. Los lenguajes de programación puramente funcionales utilizan funciones para lograr los mismos resultados.
+- Buscamos evitar duplicación de código. La duplicación hace que los errores y _bugs_ sean más frecuentes. También se hace más difícil modificar el código.
+
+- Un estilo funcional implica descomponer un problema grande en partes y resolver cada una de estas partes con una función o combinación de funciones.
+
+- La idea es arrancar con porciones de código pequeños y fáciles de entender (funciones). Combinar estos bloques en estructuras más complejas.
+
+- El estilo funcional permite obtener soluciones eficientes y elegantes a problemas modernos.
+
+- Nuestro objetivo es reemplazar los _for loops_ o estructuras de repetición.
+
+- En lugar de eso, trataremos de trabajar con operaciones vectorizadas
+
+- Por ejemplo: en una estructura funcional, no es necesario crear una lista vacía para ir guardando resultados ni ir llevando control de un índice. El código es más conciso.
 
 - En R base existen las funciones de la familia \texttt{apply}. En el paquete \texttt{purrr}, estas funciones se reemplazan por la familia \texttt{map}, más fáciles de usar. Se llaman funcionales: reciben una función como argumento.
-
-- En una estructura funcional, no es necesario crear una lista vacía para ir guardando resultados, el código es más conciso.
-
-- Premisa: arrancar con porciones de código pequeños y fáciles de entender (funciones). Combinar estos bloques en estructuras más complejas.
-
-- Evitar duplicación de código. La duplicación hace que los errores y _bugs_ sean más frecuentes. También se hace más difícil modificar el código.
-
-- Principio: no repetirse a uno mismo (DRY: _don't repeat yourself_)
-
-- R programmers prefer to solve this type of problem by applying an operation to each element in a vector. This often requires only one line of code, with no appeal to indices.
-
-- Estilo funcional: descomponer un problema grande en partes y resolver cada una de estas partes con una función o combinación de funciones.
-
-- El estilo funcional permite obtener soluciones eficientes y elegantes a problemas modernos
 
 ## Listas en R
 
 ### Listas
 
-- El bloque fundamental de \texttt{purrr} son las listas:
-  - Un vector es un objeto que guarda elementos individuales del mismo tipo
-  - Un dataframe es una estructura que guarda varios vectores de la misma longitud pero de distinto tipo.
-  - Una lista es una estructura que permite guardar objetos de distinto tipo y longitud.
+El bloque fundamental de \texttt{purrr} son las listas:
 
+- Un vector es un objeto que guarda elementos individuales del mismo tipo
+- Un dataframe es una estructura que guarda varios vectores de la misma longitud pero de distinto tipo.
+- Una lista es una estructura que permite guardar objetos de distinto tipo y longitud.
 
-- https://cran.r-project.org/web/packages/listviewer/index.html
+### ¿Cómo se definen? {.fragile}
+
+```{r listas-1, echo=TRUE}
+animalitos <- list(
+  animales = c("perro", "gato", "elefante", "vaca"),
+  acciones = c("ladrar", "maullar", "barritar", "mugir"),
+  nombres = list("Dalmata" = "Pongo", "Marley"),
+  5)
+```
+
+```{r listas-2, echo=TRUE}
+str(animalitos)
+```
+
+```{r listas-3, echo=TRUE}
+names(animalitos)
+```
+
+### ¿Cómo acceder a sus elementos? {.fragile}
+
+```{r listas-4, echo=TRUE}
+animalitos[["animales"]]
+```
+
+```{r listas-5, echo=TRUE}
+animalitos$acciones
+```
+
+```{r listas-6, echo=TRUE}
+animalitos$"nombres"
+```
+
+### {.fragile}
+
+```{r listas-7, echo=TRUE}
+animalitos[[1]]
+```
+
+```{r listas-8, echo=TRUE}
+animalitos[[4]]
+```
 
 # purrr
 
+### El paquete \texttt{purrr} {.fragile}
+
+- Muchas operaciones de \texttt{R} funcionan en forma vectorizada; aplicadas a vectores, algunas funciones se aplican elemento a elemento (una suerte de iteración)
+```{r, echo=TRUE}
+v <- c(2,5,7)
+exp(v)
+```
+- Muchas funciones no tienen esa capacidad
+```{r, echo=TRUE,results='hold'}
+meses <- c("Ene","Feb","Mar","Abr","May","Jun",
+           "Jul","Ago","Sep","Oct","Nov","Dic")
+which(meses=="Sep")
+which(meses==c("Sep","Ene"))
+```
+
+- \texttt{purrr} sirve para vectorizar operaciones y por lo tanto, para iterar
+
 ## La función \texttt{map}
 
-### A
+### La función \texttt{map}
 
-- Muchas operaciones de R simplemente funcionan en forma vectorizada; cuando proveemos vectores como entrada, la función se aplica elemento a elemento (una suerte de iteración)
+- La función (funcional) más básica de \texttt{purrr} es \texttt{map}:
+  1. Toma un vector y una función,
+  2. aplica la función a cada elemento del vector, 
+  3. devuelve los resultados en una lista.
 
-- Muchas funciones no tienen esa capacidad
-
-- \texttt{purrr} sirve para iterar
-
-- La función (funcional) más básica de \texttt{purrr} es \texttt{map}: toma un vector y una función, y aplica la función a cada elemento del vector, devolviendo los resultados en una lista.
+\begin{box_azul}{Función \texttt{map}}
+\texttt{map(.x, .f, ...)}
+\begin{itemize}
+\item \texttt{.x} es la lista (o el vector) sobre la que aplicaremos la función,
+\item \texttt{.f} es la función en cuestión,
+\item \texttt{...} son argumentos adicionales de \texttt{.f}
+\end{itemize}
+\end{box_azul}
 
 - \texttt{map(1:3,f)} es equivalente a \texttt{list(f(1), f(2), f(3))}
 
+### Ejemplos {.fragile}
+
+Apliquemos algunas funciones a nuestra lista de animalitos
+
+```{r map-2, echo=TRUE}
+map(animalitos,typeof)
+```
+### {.fragile}
+
+```{r map-3, echo=TRUE}
+map(animalitos,length)
+```
+### {.fragile}
+
+También podemos usar \texttt{purrr} con vectores
+
+```{r, echo = TRUE}
+v <- c(1,5)
+map(v,rnorm)
+```
+```{r, echo = TRUE}
+# agregamos parámetros adicionales de la función rnorm
+v <- c(1,5)
+map(v,rnorm,mean=4,sd=2)
+```
 
 ## Acomodando el tipo de salida
 
-### A
+### Variando el tipo de salida {.fragile}
 
+Si la función que aplicamos devuelve un único elemento, podemos usar las variantes \texttt{map\_lgl}, \texttt{map\_int}, \texttt{map\_dbl} o \texttt{map\_chr} y obtener un vector como resultado
+
+```{r map-4, echo=TRUE}
+map_chr(animalitos,typeof)
+```
+```{r map-5, echo=TRUE}
+map_int(animalitos,length)
+```
 
 ## Funciones anónimas
 
-### A 
+### Funciones propias {.fragile}
 
+Además de usar funciones predefinidas, podemos definir nuestras propias funciones
+
+```{r, echo=TRUE}
+sumar_diez <- function(x) return(x+10)
+map_dbl(c(-10,4,7),sumar_diez)
+```
+
+```{r, echo = TRUE}
+map_dbl(c(-10,4,7),function(x) return(x+10))
+```
+
+```{r, echo = TRUE}
+# función anónima (el argumento es siempre .x)
+map_dbl(c(-10,4,7), ~.x+10) 
+```
+
+### {.fragile}
+
+La definición de una función anónima permite ser más explícito en el pasaje de parámetros
+
+```{r, echo = TRUE}
+v <- c(1,5)
+map(v,~rnorm(.x,mean=4,sd=2)) # el argumento es siempre .x!
+```
+
+Comparar con
+
+```{r, echo = TRUE, eval = FALSE}
+v <- c(1,5)
+map(v,rnorm,mean=4,sd=2)
+```
+
+También podemos hacer
+
+```{r, echo = TRUE}
+v <- c(1,8)
+map(v,~rnorm(n=2,mean=.x,sd=1)) # el argumento es siempre .x!
+```
 
 ## Múltiples argumentos
 
-### \texttt{map2}
+### Dos argumentos: \texttt{map2} {.fragile}
 
-## dataframes
+Queremos extraer las primeras n letras de algunas palabras, con n variable
+```{r map2-ejemplo-1, echo=TRUE}
+palabras <- c("recorcholis","nacimiento","rosedal","artista","ion")
+cantidad_letras <- c(2,1,3,2,2)
+map2_chr(palabras,cantidad_letras,~substr(.x,1,.y)) # los argumentos son .x y .y
+```
 
-### Pero yo nunca usé listas...
-
-# purrr + tidyr + dplyr
-
-
-
-## Columnas lista y dataframes anidados
-
-- Some crazy stuff starts happening when you learn that tibble columns can be lists (as opposed to vectors, which is what they usually are).
-
-- For instance, a tibble can be “nested” where the tibble is essentially split into separate data frames based on a grouping variable, and these separate data frames are stored as entries of a list 
-
-### ¿Cómo se construyen?
-
-- En la definición del \texttt{tibble}
-- Usando \texttt{groupby} y \texttt{nest}
-- Como resultado de una operación.
-
-### I. En la definición del \texttt{tibble}
-
-```{r}
-
+Queremos generar dos secuencias de fechas
+```{r map2-ejemplo-2, echo=TRUE}
+inicio <- as.Date(c("2018-01-03","2019-03-06"))
+fin <- as.Date(c("2018-01-06","2019-03-08"))
+map2(inicio,fin,~seq.Date(.x,.y,by="1 day"))
 ```
 
 
-### II. Usando \texttt{nest}
+## dataframes
+
+### Pero yo nunca usé listas...{.fragile}
+
+```{r lista-dataframe-1, echo=TRUE}
+pelis <- tibble(
+cancion = c("Strange Things", "Life is a Highway", "I'm a Believer"),
+autor = c("Randy Newman", "Rascal Flatts", "Smash Mouth"),
+pelicula = c("Toy Story", "Cars", NA)
+  )
+```
+
+```{r lista-dataframe-2, echo=TRUE}
+typeof(pelis)
+```
+
+### {.fragile}
+
+```{r lista-dataframe-3, echo=TRUE}
+as.list(pelis)
+```
+
+### {.fragile}
+
+```{r lista-dataframe-4, echo=TRUE}
+map_chr(pelis,typeof)
+```
+```{r lista-dataframe-5, echo=TRUE}
+map_int(pelis,~sum(is.na(.x)))
+```
+
+### Hasta acá...
+
+\begin{box_rosa}{Resumen}
+\begin{itemize}
+\setbeamercolor{itemize item}{fg=iosPink}
+\item Las listas son estructuras de datos muy versátiles
+\item Un dataframe/tibble es una lista
+\item \texttt{purrr} sirve para iterar
+\item \texttt{map} es el caballito de batalla del paquete \texttt{purrr}
+\end{itemize}
+\end{box_rosa}
+
+# purrr + tidyr + dplyr
+
+## Columnas lista y dataframes anidados
+
+La magia empieza cuando nos damos cuenta de que en una lista podemos meter otra lista... entonces las columnas de un tibble pueden ser listas (en general son vectores)
+\vspace{0.4 cm}
+¿Cómo se construyen las columnas lista y los dataframes anidados?
+
+\begin{enumerate}[I]
+\item En la definición del \texttt{tibble}
+\item Usando \texttt{groupby} y \texttt{nest}
+\item Como resultado de una operación.
+\end{enumerate}
+
+### I. En la definición del \texttt{tibble} {.fragile}
+
+```{r columnas-lista-1, echo=TRUE}
+T1 <- tibble(
+  v1 = 1:3,
+  v2 = c("a","b","c"),
+  v3 = list(c("A","B","C")),
+  v4 = 10
+)
+```
 
 ```{r}
+T1
+```
 
+
+### {.fragile}
+
+```{r columnas-lista-2, echo=TRUE, eval=FALSE}
+T2 <- tibble(
+  v1 = 1:3,
+  v2 = c("a","b","c"),
+  v3 = list(c("A","B","C"),"B")
+)
+```
+```{r columnas-lista-3}
+T2 <- try(tibble(
+  v1 = 1:3,
+  v2 = c("a","b","c"),
+  v3 = list(c("A","B","C"),"B")
+),silent=T)
+cat(T2)
+```
+
+### {.fragile}
+
+```{r columnas-lista-4, echo=TRUE}
+T3 <- tibble(
+  v1 = 1:3,
+  v2 = c("a","b","c"),
+  v3 = list(c("A","B","C"),"perro",5)
+)
+```
+
+```{r}
+T3
+```
+
+
+### {.fragile}
+
+```{r columnas-lista-5, echo=TRUE}
+T4 <- tibble(
+  v1 = 1:3,
+  v2 = c("a","b","c"),
+  v3 = list(rnorm(1),rnorm(10),rnorm(100))
+)
+```
+
+```{r}
+T4
+```
+
+
+### {.fragile}
+
+```{r columnas-lista-6, echo=TRUE}
+animalitos <- list(animales = c("perro","gato","elefante","vaca"),
+               acciones = c("ladrar","maullar","barritar","mugir"),
+               nombres = list(c("Pongo","Marley","Golfo"),
+                              c("Pelusa","Tom"),
+                              c("Tantor","Dumbo"),
+                              c("Oscar")))
+
+as_tibble(animalitos)
+```
+
+
+### II. Usando \texttt{nest} {.fragile}
+
+```{r}
+options(width = 60)
+head(mtcars)
+```
+
+
+### {.fragile}
+
+```{r nested-dataframes-1, echo=TRUE}
+mtcars %>%
+  group_by(gear,carb) %>%
+  nest()
+```
+
+### {.fragile}
+
+```{r nested-dataframes-2, echo=TRUE}
+mtcars %>%
+  nest(datos = !c(gear,carb))
 ```
 
 
@@ -175,6 +448,10 @@ peleas %>%
 
 ### ¿Por qué necesito purrr? {.fragile}
 
+\begin{box_rosa}{¿Y ahora qué?}
+Con las columnas lista se abre ante nosotros un universo de posibilidades y \texttt{purrr} es la herramienta ideal para explorarlo
+\end{box_rosa}
+
 ```{r, eval=FALSE}
 tibble(list_col = list(c(1, 5, 7), 
                        5, 
@@ -195,7 +472,7 @@ tibble(list_col = list(c(1, 5, 7),
 
 Queremos obtener el número de mes a partir de la abreviatura
 
-```{r, echo = TRUE}
+```{r ejemplo-meses-1, echo = TRUE}
 datos <- tibble::tribble(
  ~id,~dia,  ~mes, ~año,
    1,  15, "Sep", 2019,
@@ -211,16 +488,16 @@ Idea
 1. Armar un vector con las abreviaturas de los meses
 2. Usar la función \texttt{which} junto con \texttt{map}
 
-```{r, echo=TRUE}
+```{r ejemplo-meses-2, echo=TRUE}
 meses <- c("Ene","Feb","Mar","Abr","May","Jun",
            "Jul","Ago","Sep","Oct","Nov","Dic")
 ```
 
-```{r, echo=TRUE}
+```{r ejemplo-meses-3, echo=TRUE}
 which(meses=="Sep")
 ```
 
-```{r, echo=TRUE}
+```{r ejemplo-meses-4, echo=TRUE}
 which(meses==c("Sep","Ene"))
 ```
 
@@ -435,7 +712,7 @@ plots
 
 
 ### {.fragile}
-```{r ejemplo-multiplesplots-4, echo=TRUE, fig.height=4}
+```{r ejemplo-multiplesplots-4, echo=TRUE, fig.height=4, warning=FALSE, message=FALSE}
 library(patchwork)
 plots$plot[[1]] + plots$plot[[6]]
 ```
@@ -471,7 +748,7 @@ train_test %>%
 
 # Extra
 
-## Más de dos argumentos pmap
+## Más de dos argumentos: \texttt{pmap}
 
 ## Puede fallar...
 
