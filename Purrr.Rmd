@@ -825,7 +825,7 @@ train_test <- data %>%
   select(-dummy) %>%
   filter(fold.y != fold.x) %>%
   group_by(fold.x) %>%
-  summarise(test = first(data.x),
+  summarise(test = list(first(data.x)),
             train = list(bind_rows(data.y)))
 ```
 
