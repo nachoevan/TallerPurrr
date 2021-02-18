@@ -1,4 +1,4 @@
-\documentclass[$if(fontsize)$$fontsize$,$endif$$if(handout)$handout,$endif$$if(beamer)$ignorenonframetext,$endif$$for(classoption)$$classoption$$sep$,$endfor$,handout]{$documentclass$}
+\documentclass[$if(fontsize)$$fontsize$,$endif$$if(handout)$handout,$endif$$if(beamer)$ignorenonframetext,$endif$$for(classoption)$$classoption$$sep$,$endfor$]{$documentclass$}
 
 \usetheme{frankfurt}
 
@@ -152,22 +152,30 @@ Contextuals=Alternate]{FiraCode}
 \newtcolorbox{box_roja}[1]{enhanced,sharp corners,drop fuzzy shadow,rightrule=0pt,toprule=0pt, leftrule=0pt,bottomrule=2pt,colback=iosRed!5!white,colframe=iosRed!80!black,fonttitle=\sffamily,title=#1}
 \newtcolorbox{box_azul}[1]{enhanced,sharp corners, drop fuzzy shadow,rightrule=0pt,toprule=0pt, leftrule=0pt,bottomrule=1pt,colback=iosLBlue!5!white, colframe=iosLBlue!80!black,colbacktitle=iosLBlue!80!black,title=#1}
 
+\definecolor{greenstring}{HTML}{4C946A}
+\definecolor{redcomment}{HTML}{B15963}
+\definecolor{bluehighlight}{HTML}{2E85EF}
+
 \usepackage{listings}
+
 \usepackage{lstfiracode}
+
 \lstdefinestyle{codechunk}{
 	backgroundcolor=\color[HTML]{daf1f5},
-	language=R,
+	alsoletter = {_,\.,\%,>,\~,},
+  keywords={map,map_chr,map_dbl,map_int,map2,map2_chr,pmap,possibly},
+  morestring=[b][\color{greenstring}]",
+  morecomment=[l][\color{redcomment}]\#,
 	showstringspaces=false,
+	sensitive=false,
 	basicstyle=\footnotesize\ttfamily,
 	style=FiraCodeStyle,
-	keywordstyle=\bfseries\color[HTML]{90323D},
-	keywordstyle={[2]\color[HTML]{5CB22E}},
-	keywords=[2]{TRUE,FALSE},
-	stringstyle=\color[HTML]{EBA433},
-	alsoletter ={_},
-	otherkeywords={ggplot,geom_ridges,stat_summary,aes,_qq,_line,facet_wrap,fct_reorder,gg,filter,group_by,mutate,quantiles,gg_rf,gg_pt,_sl,bootstrap_anova,summarise,map_int,pivot_longer,seq_along,geom_boxplot,geom_point,geom_hline,geom_vline,stat_smooth,select,geom_jitter,pull,map,tibble,geom_density_ridges,crossing,geom_line,geom_,as.Date,as_tibble,ungroup,kable,pivot_wider,bind_rows,ggAcf,theme,ylab,xlab,sscale_fill_continuous,arrange,unnest_wider},
-	deletekeywords={col,R,names,data,colors,args,residuals,null,_}}
-%\lstset{escapechar=\&}
+	keywordstyle=\bfseries\color{bluehighlight},
+	keywordstyle={[2]\color{red}},
+	keywords=[2]{TRUE,FALSE,NA}}
+%	keywordstyle = {[3]\color{orange}}
+%	keywords=[3]{{.x},\%>\%,\~, \~, \~ , \~\ ,,\.x,{\.y}, \.y, \.x,\.\.1,\.\.2,\.\.3}}
+
 \lstdefinestyle{output}{
 	backgroundcolor=\color[HTML]{FCFFF7},
 	language=R,
@@ -188,10 +196,10 @@ $if(subtitle)$
 $endif$
 $if(author)$
 \author{\includegraphics[width=0.2\textwidth]{purrr.jpg}\\ $for(author)$$author$$sep$ \and $endfor$\\
+\textit{evangelistaignacio@gmail.com}}
 \institute[A]{
 Grupo de Usuaries de R en Rosario
 }
-\textit{evangelistaignacio@gmail.com}}
 $endif$
 \date{$date$}
 
@@ -218,6 +226,7 @@ $endif$
 \end{frame}
 
 $endif$
+\section[Intro]{Introducción}
 $body$
 
 $if(natbib)$

@@ -32,8 +32,6 @@ options(tibble.print_max = 10)
 ```
 
 
-# Introducción
-
 ## Motivación
 
 ### Motivación {.fragile}
@@ -42,14 +40,14 @@ options(tibble.print_max = 10)
 \item Buscamos evitar duplicación de código. La duplicación hace que los errores y \textit{bugs} sean más frecuentes. También se hace más difícil modificar el código.
 \item Un estilo funcional implica descomponer un problema grande en partes y resolver cada una de estas partes con una función o combinación de funciones.
 \item La idea es arrancar con porciones de código pequeños y fáciles de entender (funciones). Combinar estos bloques en estructuras más complejas.
-\item El estilo funcional permite obtener soluciones eficientes y elegantes a problemas modernos.
+\item El estilo funcional permite obtener soluciones eficientes y elegantes a problemas cotidianos (preprocesamiento, modelización, visualización)
 \end{itemize}
 
 ### {.fragile}
 
 \begin{itemize}[<+->]
 \item Nuestro objetivo es reemplazar los \textit{for loops} o estructuras de repetición.
-\item En lugar de eso, trataremos de trabajar con operaciones vectorizadas
+\item En lugar de eso, trataremos de trabajar con operaciones vectorizadas.
 \item Por ejemplo: en una estructura funcional, no es necesario crear una lista vacía para ir guardando resultados ni ir llevando control de un índice. El código es más conciso.
 \item En R base existen las funciones de la familia \texttt{apply}. En el paquete \texttt{purrr}, estas funciones se reemplazan por la familia \texttt{map}, más fáciles de usar. Se llaman funcionales: reciben una función como argumento.
 \end{itemize}
@@ -83,7 +81,7 @@ str(animalitos)
 names(animalitos)
 ```
 
-### ¿Cómo acceder a sus elementos? {.fragile}
+### ¿Cómo se accede a sus elementos? {.fragile}
 
 ```{r listas-4, echo=TRUE}
 animalitos[["animales"]]
@@ -111,14 +109,14 @@ animalitos[[4]]
 
 ### El paquete \texttt{purrr} {.fragile}
 
-- Muchas operaciones de \texttt{R} funcionan en forma vectorizada; aplicadas a vectores, algunas funciones se aplican elemento a elemento (una suerte de iteración)
-```{r, echo=TRUE}
+- Muchas operaciones de \texttt{R} funcionan en forma vectorizada; cuando se aplican a vectores, se ejecutan elemento a elemento (una suerte de iteración)
+```{r op-vectorizada-1, echo=TRUE}
 v <- c(2,5,7)
 exp(v)
 ```
 \pause
 - Muchas funciones no tienen esa capacidad
-```{r, echo=TRUE,results='hold'}
+```{r op-vectorizada-2, echo=TRUE,results='hold'}
 meses <- c("Ene","Feb","Mar","Abr","May","Jun",
            "Jul","Ago","Sep","Oct","Nov","Dic")
 which(meses=="Sep")
@@ -161,24 +159,24 @@ El paquete \texttt{purrr} sirve para vectorizar operaciones y por lo tanto, para
 
 Apliquemos algunas funciones a nuestra lista de animalitos
 
-```{r map-2, echo=TRUE}
+```{r map-1, echo=TRUE}
 map(animalitos,typeof)
 ```
 ### {.fragile}
 
-```{r map-3, echo=TRUE}
+```{r map-2, echo=TRUE}
 map(animalitos,length)
 ```
 ### {.fragile}
 
 También podemos usar \texttt{purrr} con vectores
 
-```{r, echo = TRUE}
+```{r map-3, echo = TRUE}
 v <- c(1,3)
 map(v,rnorm)
 ```
 \pause
-```{r, echo = TRUE}
+```{r map-4, echo = TRUE}
 # agregamos parámetros adicionales de la función rnorm
 v <- c(1,5)
 map(v,rnorm,mean=4,sd=2)
@@ -186,15 +184,15 @@ map(v,rnorm,mean=4,sd=2)
 
 ## Especificando el tipo de salida
 
-### Variando el tipo de salida {.fragile}
+### Especificando el tipo de salida {.fragile}
 
 Si la función que aplicamos devuelve un único elemento, podemos usar las variantes \texttt{map\_lgl}, \texttt{map\_int}, \texttt{map\_dbl} o \texttt{map\_chr} y obtener un vector como resultado
 
-```{r map-4, echo=TRUE}
+```{r map-5, echo=TRUE}
 map_chr(animalitos,typeof)
 ```
 \pause
-```{r map-5, echo=TRUE}
+```{r map-6, echo=TRUE}
 map_int(animalitos,length)
 ```
 
@@ -204,40 +202,40 @@ map_int(animalitos,length)
 
 Además de usar funciones predefinidas, podemos definir nuestras propias funciones
 
-```{r, echo=TRUE}
-sumar_diez <- function(x) return(x+10)
-map_dbl(c(-10,4,7),sumar_diez)
+```{r map-funciones-1, echo=TRUE}
+sumar_diez <- function(x) return(x + 10)
+map_dbl(c(-10,4,7), sumar_diez)
 ```
 \pause
-```{r, echo = TRUE}
-map_dbl(c(-10,4,7),function(x) return(x+10))
+```{r map-funciones-2, echo = TRUE}
+map_dbl(c(-10,4,7), function(x) return(x + 10))
 ```
 \pause
-```{r, echo = TRUE}
+```{r map-funciones-3, echo = TRUE}
 # función anónima (el argumento es siempre .x)
-map_dbl(c(-10,4,7), ~.x+10) 
+map_dbl(c(-10,4,7), ~ .x + 10) 
 ```
 
 ### {.fragile}
 
 La definición de una función anónima permite ser más explícito en el pasaje de parámetros
 
-```{r, echo = TRUE}
+```{r map-funciones-4, echo = TRUE}
 v <- c(1,5)
-map(v,~rnorm(.x,mean=4,sd=2)) # el argumento es siempre .x!
+map(v, ~ rnorm(.x,mean=4,sd=2)) # el argumento es siempre .x!
 ```
 \pause
 Comparar con
-```{r, echo = TRUE, eval = FALSE}
+```{r map-funciones-5, echo = TRUE, eval = FALSE}
 v <- c(1,5)
 map(v,rnorm,mean=4,sd=2)
 ```
 
 \pause
 También podemos hacer
-```{r, echo = TRUE}
+```{r map-funciones-6, echo = TRUE}
 v <- c(1,8)
-map(v,~rnorm(n=2,mean=.x,sd=1)) # el argumento es siempre .x!
+map(v, ~ rnorm(n=2,mean=.x,sd=1)) # el argumento es siempre .x!
 ```
 
 ## Múltiples argumentos
@@ -250,7 +248,7 @@ Queremos extraer las primeras \texttt{n} letras de algunas palabras, donde \text
 palabras <- c("recorcholis","nacimiento","rosedal","artista","ion")
 cantidad_letras <- c(2,1,3,2,2)
 # los argumentos son .x y .y
-map2_chr(palabras,cantidad_letras,~substr(.x,1,.y)) 
+map2_chr(palabras,cantidad_letras, ~ substr(.x,1,.y)) 
 ```
 \pause
 \small
@@ -258,11 +256,11 @@ Queremos generar dos secuencias de fechas
 ```{r map2-ejemplo-2, echo=TRUE}
 inicio <- as.Date(c("2018-01-03","2019-03-06"))
 fin <- as.Date(c("2018-01-06","2019-03-08"))
-map2(inicio,fin,~seq.Date(.x,.y,by="1 day"))
+map2(inicio,fin, ~ seq.Date(.x,.y,by="1 day"))
 ```
 
 
-## dataframes
+## tibbles
 
 ### Pero yo nunca usé listas...{.fragile}
 
@@ -292,7 +290,7 @@ map_chr(pelis,typeof)
 ```
 \pause
 ```{r lista-dataframe-5, echo=TRUE}
-map_int(pelis,~sum(is.na(.x)))
+map_int(pelis, ~ sum(is.na(.x)))
 ```
 
 ### Hasta acá...
@@ -301,10 +299,10 @@ map_int(pelis,~sum(is.na(.x)))
 \begin{itemize}[<+->]
 \setbeamercolor{itemize item}{fg=iosPink}
 \item Las listas son estructuras de datos muy versátiles
-\item Un dataframe/tibble es una lista
+\item Un \texttt{dataframe}/\texttt{tibble} es una lista
 \item \texttt{purrr} sirve para iterar
 \item \texttt{map} es el caballito de batalla del paquete \texttt{purrr}
-\item Se puede especificar el tipo de salida con las variantes \texttt{map\_\*}
+\item Se puede especificar el tipo de salida con las variantes \texttt{map\_*}
 \item Para iterar a lo largo de dos listas se usa \texttt{map2}
 \item Hay varias formas de pasar una función como argumento de \texttt{map}
 \end{itemize}
@@ -313,6 +311,8 @@ map_int(pelis,~sum(is.na(.x)))
 # purrr + tidyr + dplyr
 
 ## Columnas lista y dataframes anidados
+ 
+### Columnas lista y dataframes anidados
 
 La magia empieza cuando nos damos cuenta de que en una lista podemos meter otra lista... \pause entonces las columnas de un tibble pueden ser listas (en general son vectores)
 
@@ -323,7 +323,7 @@ La magia empieza cuando nos damos cuenta de que en una lista podemos meter otra 
 
 \begin{enumerate}[I]
 \item En la definición del \texttt{tibble}
-\item Usando \texttt{groupby} y \texttt{nest}
+\item Usando \texttt{nest} (y \texttt{groupby})
 \item Como resultado de una operación.
 \end{enumerate}
 
@@ -338,7 +338,7 @@ T1 <- tibble(
 )
 ```
 
-```{r}
+```{r columnas-lista-1-NO}
 T1
 ```
 
@@ -352,7 +352,8 @@ T2 <- tibble(
   v3 = list(c("A","B","C"),"B")
 )
 ```
-```{r columnas-lista-3}
+
+```{r columnas-lista-2-NO}
 T2 <- try(tibble(
   v1 = 1:3,
   v2 = c("a","b","c"),
@@ -363,7 +364,7 @@ cat(T2)
 
 ### {.fragile}
 
-```{r columnas-lista-4, echo=TRUE}
+```{r columnas-lista-3, echo=TRUE}
 T3 <- tibble(
   v1 = 1:3,
   v2 = c("a","b","c"),
@@ -371,29 +372,29 @@ T3 <- tibble(
 )
 ```
 
-```{r}
+```{r columnas-lista-3-NO}
 T3
 ```
 
 
 ### {.fragile}
 
-```{r columnas-lista-5, echo=TRUE}
+```{r columnas-lista-4, echo=TRUE}
 T4 <- tibble(
   v1 = 1:3,
   v2 = c("a","b","c"),
-  v3 = list(rnorm(1),rnorm(10),rnorm(100))
+  v3 = list(rnorm(1), rnorm(10), rnorm(100))
 )
 ```
 
-```{r}
+```{r columnas-lista-4-NO}
 T4
 ```
 
 
 ### {.fragile}
 
-```{r columnas-lista-6, echo=TRUE}
+```{r columnas-lista-5, echo=TRUE}
 animalitos <- list(animales = c("perro","gato","elefante","vaca"),
                acciones = c("ladrar","maullar","barritar","mugir"),
                nombres = list(c("Pongo","Marley","Golfo"),
@@ -464,14 +465,27 @@ peleas %>%
   unnest(casting_split) %>%
   left_join(luchadores, by = c("casting_split" = "codigo"))
 ```
+### {.fragile}
+
+```{r ejemplo-separarfilas-3-NO, echo = TRUE}
+peleas %>%
+  mutate(casting_split = strsplit(casting, split = ",")) %>%
+  select(-horario,-casting)
+```
 
 
 ## mutate + purrr
 
-### ¿Por qué necesito purrr? {.fragile}
+### \texttt{mutate} + \texttt{purrr}  {.fragile}
 
 \begin{box_rosa}{¿Y ahora qué?}
-Con las columnas lista se abre ante nosotros un universo de posibilidades y \texttt{purrr} es la herramienta ideal para explorarlo
+Con las columnas lista se abre ante nosotros un universo de posibilidades y \texttt{purrr} es la herramienta ideal para explorarlo.
+\end{box_rosa}
+
+\pause
+
+\begin{box_rosa}{\texttt{mutate} + \texttt{purrr}}
+Aplicar \texttt{map} a un \texttt{tibble} realiza operaciones por columna. Con \texttt{mutate} + \texttt{map} hacemos magia por filas.
 \end{box_rosa}
 
 ## Ejemplos
@@ -513,28 +527,28 @@ which(meses==c("Sep","Ene"))
 
 ```{r echo = TRUE}
 datos %>%
-  mutate(mes_n = map(mes,~which(meses==.x)))
+  mutate(mes_n = map(mes, ~ which(meses==.x)))
 ```
 
 ### {.fragile}
 
 ```{r echo = TRUE}
 datos %>%
-  mutate(mes_n = map(mes,~which(toupper(meses)==toupper(.x))))
+  mutate(mes_n = map(mes, ~ which(toupper(meses)==toupper(.x))))
 ```
 
 ### {.fragile}
 
 ```{r echo = TRUE}
 datos %>%
-  mutate(mes_n = map_int(mes,~which(toupper(meses)==toupper(.x))))
+  mutate(mes_n = map_int(mes, ~ which(toupper(meses)==toupper(.x))))
 ```
 
 ### 2. Secuencia de fechas {.fragile}
 
 Contamos con los movimientos de dos empresas. Interesa tener la serie temporal de eventos para cada empresa y producto. 
 
-```{r ejemplofechas1, echo = TRUE}
+```{r ejemplo-fechas-1, echo = TRUE}
 datos <- tibble::tribble(
   ~empresa, ~producto,       ~fecha, ~evento,
        "A",      "A1", "02/06/2018",     112,
@@ -559,7 +573,7 @@ Idea:
 
 ### {.fragile}
 
-```{r ejemplo-fechas-2, echo = TRUE}
+```{r ejemplo-fechas-2, echo = TRUE, warning=FALSE, message=FALSE}
 fechas_todas <- 
   datos %>%
   group_by(empresa, producto) %>%
@@ -567,13 +581,14 @@ fechas_todas <-
             fecha_final = max(fecha)) %>%
   mutate(fechas = map2(fecha_inicial,
                        fecha_final,
-                       ~seq.Date(.x,.y,by="1 day"))) %>%
-  select(-fecha_inicial,-fecha_final)
+                       ~ seq.Date(.x,.y,by="1 day"))) %>%
+  select(-fecha_inicial,-fecha_final) %>%
+  ungroup()
 ```
 
 ### {.fragile}
 
-```{r, echo = TRUE}
+```{r, echo = TRUE, warning=FALSE, message=FALSE}
 datos %>%
   group_by(empresa, producto) %>%
   summarise(fecha_inicial = min(fecha),
@@ -582,14 +597,15 @@ datos %>%
 
 ### {.fragile}
 
-```{r, echo = TRUE}
+```{r, echo = TRUE, warning=FALSE, message=FALSE}
   datos %>%
   group_by(empresa, producto) %>%
   summarise(fecha_inicial = min(fecha),
             fecha_final = max(fecha)) %>%
   mutate(fechas = map2(fecha_inicial,
                        fecha_final,
-                       ~seq.Date(.x,.y,by="1 day")))
+                       ~ seq.Date(.x,.y,by="1 day"))) %>%
+  ungroup()
 ```
 
 ### {.fragile}
@@ -619,7 +635,7 @@ Idea:
 ```{r ejemplo-abrirarchivos-2, echo = TRUE, eval=FALSE}
 list.files(pattern="archivo") %>%
   tibble(archivos = .) %>%
-  mutate(contenido = map(archivos,read.csv)) %>%
+  mutate(contenido = map(archivos, read.csv)) %>%
   unnest(contenido)
 ```
 ### {.fragile}
@@ -627,7 +643,7 @@ list.files(pattern="archivo") %>%
 ```{r, echo = TRUE}
 list.files(pattern="archivo") %>%
   tibble(archivos = .) %>%
-  mutate(contenido = map(archivos,read.csv))
+  mutate(contenido = map(archivos, read.csv))
 ```
 
 ### {.fragile}
@@ -635,7 +651,7 @@ list.files(pattern="archivo") %>%
 ```{r, echo = TRUE}
 list.files(pattern="archivo") %>%
   tibble(archivos = .) %>%
-  mutate(contenido = map(archivos,read.csv)) %>%
+  mutate(contenido = map(archivos, read.csv)) %>%
   unnest(contenido)
 ```
 
@@ -655,7 +671,7 @@ datos <- tibble::tribble(
        "Los Palmeras",                    "La cola",    "A la una, a la dos, a la one two three four five seven nine")
 ```
 
-```{r ejemplo-multiplessalidas-2}
+```{r ejemplo-multiplessalidas-1-NO}
 options(width = 60)
 datos
 ```
@@ -705,13 +721,13 @@ datos %>%
 
 ### {.fragile}
 
-```{r, echo = TRUE, eval = FALSE}
+```{r ejemplo-multiplessalidas-5, echo = TRUE, eval = FALSE}
 datos %>%
   mutate(resultado = map(frase,analizar_frase)) %>%
   unnest_wider(resultado)
 ```
 
-```{r ejemplo-multiplessalidas-5, echo = FALSE}
+```{r ejemplo-multiplessalidas-5-NO, echo = FALSE}
 options(width = 60)
 datos %>%
   mutate(resultado = map(frase,analizar_frase)) %>%
@@ -725,7 +741,7 @@ Queremos construir un conjunto de plots mostrando los ajustes de polinomios de d
 
 ```{r ejemplo-multiplesplots-1, echo = TRUE}
 datos <- tibble::tribble(
- ~`x`,  ~`y`,
+   ~x,    ~y,
   211,   184,
   230,   147,
   587,   413,
@@ -749,16 +765,18 @@ Idea:
 ### {.fragile}
 
 ```{r ejemplo-multiplesplots-2, echo=TRUE, eval=FALSE}
-plots <- crossing(poly = 1:6, datos) %>%
-  nest(datos = !poly) %>%
+plots <- crossing(orden = 1:6, datos) %>%
+  nest(datos = !orden) %>%
   ungroup() %>%
-  mutate(plot = map2(datos, poly,
-                     function(data, poly) {
-                       ggplot(data, aes(x = x, y = y)) +
+  mutate(plot = map2(datos, orden,
+                     function(.x, .y) {
+                       ggplot(.x, aes(x = x, y = y)) +
                          geom_point() +
                          stat_smooth(
                            method = "lm", se = FALSE,
-                           formula = y ~ poly(x, poly, raw = TRUE),
+                           formula = y ~ poly(x, 
+                                              degree=.y, 
+                                              raw = TRUE),
                            colour = "maroon1") + 
                          theme_minimal()
                      }))
@@ -780,16 +798,18 @@ crossing(poly = 1:6, datos) %>%
 ### {.fragile}
 
 ```{r, echo=TRUE}
-plots <- crossing(poly = 1:6, datos) %>%
-  nest(datos = !poly) %>%
+plots <- crossing(orden = 1:6, datos) %>%
+  nest(datos = !orden) %>%
   ungroup() %>%
-  mutate(plot = map2(datos, poly,
-                     function(data, poly) {
-                       ggplot(data, aes(x = x, y = y)) +
+  mutate(plot = map2(datos, orden,
+                     function(.x, .y) {
+                       ggplot(.x, aes(x = x, y = y)) +
                          geom_point() +
                          stat_smooth(
                            method = "lm", se = FALSE,
-                           formula = y ~ poly(x, poly, raw = TRUE),
+                           formula = y ~ poly(x, 
+                                              degree= .y, 
+                                              raw = TRUE),
                            colour = "maroon1") + 
                          theme_minimal()
                      }))
@@ -809,7 +829,7 @@ plots$plot[[1]] + plots$plot[[6]]
 
 ### 6. K-fold cross validation {.fragile}
 
-```{r echo=TRUE}
+```{r ejemplo-cv-1, echo=TRUE}
 K <- 3
 data <- mtcars %>% 
   mutate(fold = rep(1:K,length.out=nrow(.))) %>% 
@@ -819,7 +839,7 @@ data <- mtcars %>%
   mutate(dummy = 1)
 ```
 
-```{r echo=TRUE}
+```{r ejemplo-cv-2, echo=TRUE, warning=FALSE, message=FALSE}
 train_test <- data %>% 
   inner_join(data, by="dummy") %>%
   select(-dummy) %>%
@@ -829,10 +849,10 @@ train_test <- data %>%
             train = list(bind_rows(data.y)))
 ```
 
-```{r echo=TRUE, eval=FALSE}
+```{r ejemplo-cv-3, echo=TRUE, eval=FALSE}
 train_test %>%
-  mutate(modelo = map(train,~lm(mpg ~ wt,data=.x)),
-         pred = map2(modelo,test,~predict(.x,.y)),
+  mutate(modelo = map(train, ~ lm(mpg ~ wt,data=.x)),
+         pred = map2(modelo,test, ~ predict(.x,.y)),
          real = map(test,"mpg"))
 ```
 
@@ -870,21 +890,21 @@ train_test
 
 ```{r echo=TRUE}
 train_test %>%
-  mutate(modelo = map(train,~lm(mpg ~ wt,data=.x)))
+  mutate(modelo = map(train, ~ lm(mpg ~ wt,data=.x)))
 ```
 
 ```{r echo=TRUE}
 train_test %>%
-  mutate(modelo = map(train,~lm(mpg ~ wt,data=.x)),
-         pred = map2(modelo,test,~predict(.x,.y)))
+  mutate(modelo = map(train, ~ lm(mpg ~ wt,data=.x)),
+         pred = map2(modelo,test, ~ predict(.x,.y)))
 ```
 
 ### {.fragile}
 
 ```{r echo=TRUE}
 train_test %>%
-  mutate(modelo = map(train,~lm(mpg ~ wt,data=.x)),
-         pred = map2(modelo,test,~predict(.x,.y)),
+  mutate(modelo = map(train, ~ lm(mpg ~ wt,data=.x)),
+         pred = map2(modelo,test, ~ predict(.x,.y)),
          real = map(test,"mpg"))
 ```
 
@@ -894,9 +914,9 @@ train_test %>%
 
 ### Más de dos argumentos: \texttt{pmap}
 
-Cuando queremos vectorizar operaciones sobre una lista (o vector) usamos \texttt{map\_\*}; para iterar sobre dos listas, \texttt{map2\_\*}; para más de dos listas se usa \texttt{pmap\_\*}
+Cuando queremos vectorizar operaciones sobre una lista (o vector) usamos \texttt{map\_*}; para iterar sobre dos listas, \texttt{map2\_*}; para más de dos listas se usa \texttt{pmap\_*}
 
-\begin{box_azul}{Función \texttt{map}}
+\begin{box_azul}{Función \texttt{pmap}}
 \texttt{pmap(.l, .f, ...)}
 \begin{itemize}[<+->]
 \item \texttt{.l} es una lista de listas sobre la que aplicaremos la función,
@@ -907,13 +927,13 @@ Cuando queremos vectorizar operaciones sobre una lista (o vector) usamos \texttt
 
 ### {.fragile}
 
-```{r echo=TRUE}
+```{r pmap-1, echo=TRUE}
 bolilleros <- list(1:6,1:50,1:100)
 cant <- list(6,5,4)
 con_reemplazo <- list(TRUE,FALSE,FALSE)
 
 pmap(list(bolilleros,cant,con_reemplazo),
-     ~sample(x = ..1, size = ..2, replace = ..3))
+     ~ sample(x = ..1, size = ..2, replace = ..3))
 ```
 
 ## Puede fallar...
@@ -922,7 +942,7 @@ pmap(list(bolilleros,cant,con_reemplazo),
 
 Ocasionalmente hay funciones que pueden fallar y es necesario manejar los errores
 
-```{r, echo=TRUE, eval=FALSE}
+```{r possibly-1, echo=TRUE, eval=FALSE}
 c(list.files(pattern="archivo"),"archivo_4.csv") %>%
   tibble(archivos = .) %>%
   mutate(contenido = map(archivos,read.csv)) %>%
@@ -940,7 +960,7 @@ cat(e)
 
 Para salvar los errores existe en \texttt{purrr} la función \texttt{possibly}. Recibe como primer argumento una función y devuelve una nueva función que tiene una salida específica en caso de que falle (parámetro \texttt{otherwise}).
 
-```{r echo=TRUE, warning=FALSE}
+```{r possibly-2, echo=TRUE, warning=FALSE}
 possibly_read.csv <- possibly(read.csv,otherwise = data.frame())
 
 c(list.files(pattern="archivo"),"archivo_4.csv") %>%
@@ -952,6 +972,18 @@ c(list.files(pattern="archivo"),"archivo_4.csv") %>%
 
 ### Resumen
 
+\begin{box_rosa}{Yo $\heartsuit$ \texttt{purrr}}
+\begin{itemize}[<+->]
+\setbeamercolor{itemize item}{fg=iosPink}
+\item Vale la pena amigarse con las listas
+\item El paquete \texttt{purrr} sirve para vectorizar operaciones
+\item El paquete \texttt{purrr} sirve para iterar
+\item En un \texttt{purrr} podemos meter cualquier cosa
+\item \texttt{dplyr} + \texttt{tidyr} + \texttt{purrr} = lo que vos quieras
+\item Superioridad estética y moral de soluciones con un enfoque funcional
+\end{itemize}
+\end{box_rosa}
+
 # Referencias
 
 ### Referencias {.fragile}
@@ -962,3 +994,9 @@ c(list.files(pattern="archivo"),"archivo_4.csv") %>%
 \item Wickham, Hadley (2019). \textit{Advanced R -- 2nd Edition}. Capítulo 9. CRC Press. \href{https://adv-r.hadley.nz/functionals.html#functionals}{Link}.
 \item Baumer B., Kaplan D. y Horton N. (2021). \textit{Modern Data Science with R -- 2nd Edition}. Capítulo 7. CRC Press. \href{https://mdsr-book.github.io/mdsr2e/ch-iteration.html#sec:vectorized}{Link}. 
 \end{itemize}
+
+\section*{}
+### 
+
+![](folks.jpg)
+
