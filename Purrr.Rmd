@@ -466,7 +466,7 @@ peleas %>%
 ```
 
 
-## \texttt{mutate} + \texttt{purrr}
+## mutate + purrr
 
 ### ¿Por qué necesito purrr? {.fragile}
 
@@ -573,6 +573,27 @@ fechas_todas <-
 
 ### {.fragile}
 
+```{r, echo = TRUE}
+datos %>%
+  group_by(empresa, producto) %>%
+  summarise(fecha_inicial = min(fecha),
+            fecha_final = max(fecha))
+```
+
+### {.fragile}
+
+```{r, echo = TRUE}
+  datos %>%
+  group_by(empresa, producto) %>%
+  summarise(fecha_inicial = min(fecha),
+            fecha_final = max(fecha)) %>%
+  mutate(fechas = map2(fecha_inicial,
+                       fecha_final,
+                       ~seq.Date(.x,.y,by="1 day")))
+```
+
+### {.fragile}
+
 ```{r ejemplo-fechas-3, echo = TRUE}
 fechas_todas %>%
   unnest(fechas) %>%
@@ -595,13 +616,28 @@ Idea:
 
 ### {.fragile}
 
-```{r ejemplo-abrirarchivos-2, echo = TRUE}
+```{r ejemplo-abrirarchivos-2, echo = TRUE, eval=FALSE}
 list.files(pattern="archivo") %>%
   tibble(archivos = .) %>%
   mutate(contenido = map(archivos,read.csv)) %>%
   unnest(contenido)
 ```
+### {.fragile}
 
+```{r, echo = TRUE}
+list.files(pattern="archivo") %>%
+  tibble(archivos = .) %>%
+  mutate(contenido = map(archivos,read.csv))
+```
+
+### {.fragile}
+
+```{r, echo = TRUE}
+list.files(pattern="archivo") %>%
+  tibble(archivos = .) %>%
+  mutate(contenido = map(archivos,read.csv)) %>%
+  unnest(contenido)
+```
 
 ### 4. Múltiples salidas {.fragile}
 
@@ -660,6 +696,21 @@ datos %>%
   unnest_wider(resultado)
 ```
 
+### {.fragile}
+
+```{r, echo = TRUE, eval = TRUE}
+datos %>%
+  mutate(resultado = map(frase,analizar_frase))
+```
+
+### {.fragile}
+
+```{r, echo = TRUE, eval = FALSE}
+datos %>%
+  mutate(resultado = map(frase,analizar_frase)) %>%
+  unnest_wider(resultado)
+```
+
 ```{r ejemplo-multiplessalidas-5, echo = FALSE}
 options(width = 60)
 datos %>%
@@ -697,7 +748,38 @@ Idea:
 
 ### {.fragile}
 
-```{r ejemplo-multiplesplots-2, echo=TRUE}
+```{r ejemplo-multiplesplots-2, echo=TRUE, eval=FALSE}
+plots <- crossing(poly = 1:6, datos) %>%
+  nest(datos = !poly) %>%
+  ungroup() %>%
+  mutate(plot = map2(datos, poly,
+                     function(data, poly) {
+                       ggplot(data, aes(x = x, y = y)) +
+                         geom_point() +
+                         stat_smooth(
+                           method = "lm", se = FALSE,
+                           formula = y ~ poly(x, poly, raw = TRUE),
+                           colour = "maroon1") + 
+                         theme_minimal()
+                     }))
+```
+
+### {.fragile}
+
+```{r echo = TRUE}
+crossing(poly = 1:6, datos)
+```
+
+### {.fragile}
+
+```{r echo = TRUE}
+crossing(poly = 1:6, datos) %>%
+  nest(datos = !poly)
+```
+
+### {.fragile}
+
+```{r, echo=TRUE}
 plots <- crossing(poly = 1:6, datos) %>%
   nest(datos = !poly) %>%
   ungroup() %>%
@@ -727,8 +809,8 @@ plots$plot[[1]] + plots$plot[[6]]
 
 ### 6. K-fold cross validation {.fragile}
 
-```{r}
-K <- 4
+```{r echo=TRUE}
+K <- 3
 data <- mtcars %>% 
   mutate(fold = rep(1:K,length.out=nrow(.))) %>% 
   arrange(fold) %>%
@@ -737,7 +819,7 @@ data <- mtcars %>%
   mutate(dummy = 1)
 ```
 
-```{r}
+```{r echo=TRUE}
 train_test <- data %>% 
   inner_join(data, by="dummy") %>%
   select(-dummy) %>%
@@ -747,7 +829,59 @@ train_test <- data %>%
             train = list(bind_rows(data.y)))
 ```
 
-```{r}
+```{r echo=TRUE, eval=FALSE}
+train_test %>%
+  mutate(modelo = map(train,~lm(mpg ~ wt,data=.x)),
+         pred = map2(modelo,test,~predict(.x,.y)),
+         real = map(test,"mpg"))
+```
+
+### {.fragile}
+
+```{r echo = TRUE}
+data
+```
+
+### {.fragile}
+
+```{r echo = TRUE}
+data %>% 
+  inner_join(data, by="dummy") %>%
+  select(-dummy)
+```
+
+### {.fragile}
+
+```{r echo = TRUE}
+data %>% 
+  inner_join(data, by="dummy") %>%
+  select(-dummy) %>%
+  filter(fold.y != fold.x) %>%
+  group_by(fold.x)
+```
+
+### {.fragile}
+
+```{r echo = TRUE}
+train_test
+```
+
+### {.fragile}
+
+```{r echo=TRUE}
+train_test %>%
+  mutate(modelo = map(train,~lm(mpg ~ wt,data=.x)))
+```
+
+```{r echo=TRUE}
+train_test %>%
+  mutate(modelo = map(train,~lm(mpg ~ wt,data=.x)),
+         pred = map2(modelo,test,~predict(.x,.y)))
+```
+
+### {.fragile}
+
+```{r echo=TRUE}
 train_test %>%
   mutate(modelo = map(train,~lm(mpg ~ wt,data=.x)),
          pred = map2(modelo,test,~predict(.x,.y)),
@@ -771,7 +905,7 @@ Cuando queremos vectorizar operaciones sobre una lista (o vector) usamos \texttt
 \end{itemize}
 \end{box_azul}
 
-### Ejemplo {.fragile}
+### {.fragile}
 
 ```{r echo=TRUE}
 bolilleros <- list(1:6,1:50,1:100)
