@@ -36,25 +36,23 @@ options(tibble.print_max = 10)
 
 ## Motivación
 
-### Motivación
+### Motivación {.fragile}
 
-\small
+\begin{itemize}[<+->]
+\item Buscamos evitar duplicación de código. La duplicación hace que los errores y \textit{bugs} sean más frecuentes. También se hace más difícil modificar el código.
+\item Un estilo funcional implica descomponer un problema grande en partes y resolver cada una de estas partes con una función o combinación de funciones.
+\item La idea es arrancar con porciones de código pequeños y fáciles de entender (funciones). Combinar estos bloques en estructuras más complejas.
+\item El estilo funcional permite obtener soluciones eficientes y elegantes a problemas modernos.
+\end{itemize}
 
-- Buscamos evitar duplicación de código. La duplicación hace que los errores y _bugs_ sean más frecuentes. También se hace más difícil modificar el código.
+### {.fragile}
 
-- Un estilo funcional implica descomponer un problema grande en partes y resolver cada una de estas partes con una función o combinación de funciones.
-
-- La idea es arrancar con porciones de código pequeños y fáciles de entender (funciones). Combinar estos bloques en estructuras más complejas.
-
-- El estilo funcional permite obtener soluciones eficientes y elegantes a problemas modernos.
-
-- Nuestro objetivo es reemplazar los _for loops_ o estructuras de repetición.
-
-- En lugar de eso, trataremos de trabajar con operaciones vectorizadas
-
-- Por ejemplo: en una estructura funcional, no es necesario crear una lista vacía para ir guardando resultados ni ir llevando control de un índice. El código es más conciso.
-
-- En R base existen las funciones de la familia \texttt{apply}. En el paquete \texttt{purrr}, estas funciones se reemplazan por la familia \texttt{map}, más fáciles de usar. Se llaman funcionales: reciben una función como argumento.
+\begin{itemize}[<+->]
+\item Nuestro objetivo es reemplazar los \textit{for loops} o estructuras de repetición.
+\item En lugar de eso, trataremos de trabajar con operaciones vectorizadas
+\item Por ejemplo: en una estructura funcional, no es necesario crear una lista vacía para ir guardando resultados ni ir llevando control de un índice. El código es más conciso.
+\item En R base existen las funciones de la familia \texttt{apply}. En el paquete \texttt{purrr}, estas funciones se reemplazan por la familia \texttt{map}, más fáciles de usar. Se llaman funcionales: reciben una función como argumento.
+\end{itemize}
 
 ## Listas en R
 
@@ -76,10 +74,11 @@ animalitos <- list(
   5)
 ```
 
+\pause
 ```{r listas-2, echo=TRUE}
 str(animalitos)
 ```
-
+\pause
 ```{r listas-3, echo=TRUE}
 names(animalitos)
 ```
@@ -89,11 +88,11 @@ names(animalitos)
 ```{r listas-4, echo=TRUE}
 animalitos[["animales"]]
 ```
-
+\pause
 ```{r listas-5, echo=TRUE}
 animalitos$acciones
 ```
-
+\pause
 ```{r listas-6, echo=TRUE}
 animalitos$"nombres"
 ```
@@ -103,7 +102,7 @@ animalitos$"nombres"
 ```{r listas-7, echo=TRUE}
 animalitos[[1]]
 ```
-
+\pause
 ```{r listas-8, echo=TRUE}
 animalitos[[4]]
 ```
@@ -117,6 +116,7 @@ animalitos[[4]]
 v <- c(2,5,7)
 exp(v)
 ```
+\pause
 - Muchas funciones no tienen esa capacidad
 ```{r, echo=TRUE,results='hold'}
 meses <- c("Ene","Feb","Mar","Abr","May","Jun",
@@ -125,16 +125,24 @@ which(meses=="Sep")
 which(meses==c("Sep","Ene"))
 ```
 
-- \texttt{purrr} sirve para vectorizar operaciones y por lo tanto, para iterar
+### 
+
+\begin{box_rosa}{Idea clave}
+El paquete \texttt{purrr} sirve para vectorizar operaciones y por lo tanto, para iterar
+\end{box_rosa}
 
 ## La función \texttt{map}
 
-### La función \texttt{map}
+### La función \texttt{map} {.fragile}
 
 - La función (funcional) más básica de \texttt{purrr} es \texttt{map}:
-  1. Toma un vector y una función,
-  2. aplica la función a cada elemento del vector, 
-  3. devuelve los resultados en una lista.
+\begin{enumerate}[<+->]
+  \item Toma un vector y una función,
+  \item aplica la función a cada elemento del vector, 
+  \item devuelve los resultados en una lista.
+\end{enumerate}
+
+\pause
 
 \begin{box_azul}{Función \texttt{map}}
 \texttt{map(.x, .f, ...)}
@@ -144,6 +152,8 @@ which(meses==c("Sep","Ene"))
 \item \texttt{...} son argumentos adicionales de \texttt{.f}
 \end{itemize}
 \end{box_azul}
+
+\pause
 
 - \texttt{map(1:3,f)} es equivalente a \texttt{list(f(1), f(2), f(3))}
 
@@ -164,16 +174,17 @@ map(animalitos,length)
 También podemos usar \texttt{purrr} con vectores
 
 ```{r, echo = TRUE}
-v <- c(1,5)
+v <- c(1,3)
 map(v,rnorm)
 ```
+\pause
 ```{r, echo = TRUE}
 # agregamos parámetros adicionales de la función rnorm
 v <- c(1,5)
 map(v,rnorm,mean=4,sd=2)
 ```
 
-## Acomodando el tipo de salida
+## Especificando el tipo de salida
 
 ### Variando el tipo de salida {.fragile}
 
@@ -182,6 +193,7 @@ Si la función que aplicamos devuelve un único elemento, podemos usar las varia
 ```{r map-4, echo=TRUE}
 map_chr(animalitos,typeof)
 ```
+\pause
 ```{r map-5, echo=TRUE}
 map_int(animalitos,length)
 ```
@@ -196,11 +208,11 @@ Además de usar funciones predefinidas, podemos definir nuestras propias funcion
 sumar_diez <- function(x) return(x+10)
 map_dbl(c(-10,4,7),sumar_diez)
 ```
-
+\pause
 ```{r, echo = TRUE}
 map_dbl(c(-10,4,7),function(x) return(x+10))
 ```
-
+\pause
 ```{r, echo = TRUE}
 # función anónima (el argumento es siempre .x)
 map_dbl(c(-10,4,7), ~.x+10) 
@@ -214,16 +226,15 @@ La definición de una función anónima permite ser más explícito en el pasaje
 v <- c(1,5)
 map(v,~rnorm(.x,mean=4,sd=2)) # el argumento es siempre .x!
 ```
-
+\pause
 Comparar con
-
 ```{r, echo = TRUE, eval = FALSE}
 v <- c(1,5)
 map(v,rnorm,mean=4,sd=2)
 ```
 
+\pause
 También podemos hacer
-
 ```{r, echo = TRUE}
 v <- c(1,8)
 map(v,~rnorm(n=2,mean=.x,sd=1)) # el argumento es siempre .x!
@@ -232,14 +243,17 @@ map(v,~rnorm(n=2,mean=.x,sd=1)) # el argumento es siempre .x!
 ## Múltiples argumentos
 
 ### Dos argumentos: \texttt{map2} {.fragile}
+\small
 
-Queremos extraer las primeras n letras de algunas palabras, con n variable
+Queremos extraer las primeras \texttt{n} letras de algunas palabras, donde \texttt{n} es una cantidad variable
 ```{r map2-ejemplo-1, echo=TRUE}
 palabras <- c("recorcholis","nacimiento","rosedal","artista","ion")
 cantidad_letras <- c(2,1,3,2,2)
-map2_chr(palabras,cantidad_letras,~substr(.x,1,.y)) # los argumentos son .x y .y
+# los argumentos son .x y .y
+map2_chr(palabras,cantidad_letras,~substr(.x,1,.y)) 
 ```
-
+\pause
+\small
 Queremos generar dos secuencias de fechas
 ```{r map2-ejemplo-2, echo=TRUE}
 inicio <- as.Date(c("2018-01-03","2019-03-06"))
@@ -257,9 +271,10 @@ pelis <- tibble(
 cancion = c("Strange Things", "Life is a Highway", "I'm a Believer"),
 autor = c("Randy Newman", "Rascal Flatts", "Smash Mouth"),
 pelicula = c("Toy Story", "Cars", NA)
-  )
+)
 ```
 
+\pause
 ```{r lista-dataframe-2, echo=TRUE}
 typeof(pelis)
 ```
@@ -275,6 +290,7 @@ as.list(pelis)
 ```{r lista-dataframe-4, echo=TRUE}
 map_chr(pelis,typeof)
 ```
+\pause
 ```{r lista-dataframe-5, echo=TRUE}
 map_int(pelis,~sum(is.na(.x)))
 ```
@@ -282,12 +298,15 @@ map_int(pelis,~sum(is.na(.x)))
 ### Hasta acá...
 
 \begin{box_rosa}{Resumen}
-\begin{itemize}
+\begin{itemize}[<+->]
 \setbeamercolor{itemize item}{fg=iosPink}
 \item Las listas son estructuras de datos muy versátiles
 \item Un dataframe/tibble es una lista
 \item \texttt{purrr} sirve para iterar
 \item \texttt{map} es el caballito de batalla del paquete \texttt{purrr}
+\item Se puede especificar el tipo de salida con las variantes \texttt{map\_\*}
+\item Para iterar a lo largo de dos listas se usa \texttt{map2}
+\item Hay varias formas de pasar una función como argumento de \texttt{map}
 \end{itemize}
 \end{box_rosa}
 
@@ -295,8 +314,11 @@ map_int(pelis,~sum(is.na(.x)))
 
 ## Columnas lista y dataframes anidados
 
-La magia empieza cuando nos damos cuenta de que en una lista podemos meter otra lista... entonces las columnas de un tibble pueden ser listas (en general son vectores)
+La magia empieza cuando nos damos cuenta de que en una lista podemos meter otra lista... \pause entonces las columnas de un tibble pueden ser listas (en general son vectores)
+
 \vspace{0.4 cm}
+\pause
+
 ¿Cómo se construyen las columnas lista y los dataframes anidados?
 
 \begin{enumerate}[I]
@@ -419,7 +441,7 @@ peleas <- tibble::tribble(
       3,  "19:40", "jfa348,fez195,gky651,wpx281",
       4,  "21:00",               "thf028,fez195")
 ```
-
+\pause
 ```{r ejemplo-separarfilas-2, echo = TRUE}
 luchadores <- tibble::tribble(
    ~codigo,           ~nombre,
@@ -451,20 +473,6 @@ peleas %>%
 \begin{box_rosa}{¿Y ahora qué?}
 Con las columnas lista se abre ante nosotros un universo de posibilidades y \texttt{purrr} es la herramienta ideal para explorarlo
 \end{box_rosa}
-
-```{r, eval=FALSE}
-tibble(list_col = list(c(1, 5, 7), 
-                       5, 
-                       c(10, 10, 11))) %>%
-  mutate(list_sum = sum(list_col))
-```
-
-```{r, eval = FALSE}
-tibble(list_col = list(c(1, 5, 7), 
-                       5, 
-                       c(10, 10, 11))) %>%
-  mutate(list_sum = map(list_col, sum))
-```
 
 ## Ejemplos
 
@@ -750,12 +758,73 @@ train_test %>%
 
 ## Más de dos argumentos: \texttt{pmap}
 
+### Más de dos argumentos: \texttt{pmap}
+
+Cuando queremos vectorizar operaciones sobre una lista (o vector) usamos \texttt{map\_\*}; para iterar sobre dos listas, \texttt{map2\_\*}; para más de dos listas se usa \texttt{pmap\_\*}
+
+\begin{box_azul}{Función \texttt{map}}
+\texttt{pmap(.l, .f, ...)}
+\begin{itemize}[<+->]
+\item \texttt{.l} es una lista de listas sobre la que aplicaremos la función,
+\item \texttt{.f} es la función en cuestión; si la definimos en forma anónima, sus argumentos son \texttt{..1}, \texttt{..2}, \texttt{..3}, etc.
+\item \texttt{...} son argumentos adicionales de \texttt{.f}
+\end{itemize}
+\end{box_azul}
+
+### Ejemplo {.fragile}
+
+```{r echo=TRUE}
+bolilleros <- list(1:6,1:50,1:100)
+cant <- list(6,5,4)
+con_reemplazo <- list(TRUE,FALSE,FALSE)
+
+pmap(list(bolilleros,cant,con_reemplazo),
+     ~sample(x = ..1, size = ..2, replace = ..3))
+```
+
 ## Puede fallar...
 
-### \texttt{possibly}
+### \texttt{possibly} {.fragile}
 
-## \texttt{repeat}
+Ocasionalmente hay funciones que pueden fallar y es necesario manejar los errores
+
+```{r, echo=TRUE, eval=FALSE}
+c(list.files(pattern="archivo"),"archivo_4.csv") %>%
+  tibble(archivos = .) %>%
+  mutate(contenido = map(archivos,read.csv)) %>%
+  unnest(contenido)
+```
+```{r echo=FALSE,eval=TRUE,warning=FALSE}
+options(width = 60)
+e <- try(c(list.files(pattern="archivo"),"archivo_4.csv") %>%
+  tibble(archivos = .) %>%
+  mutate(contenido = map(archivos,read.csv)) %>%
+  unnest(contenido),silent = TRUE)
+cat(e)
+```
+### {.fragile}
+
+Para salvar los errores existe en \texttt{purrr} la función \texttt{possibly}. Recibe como primer argumento una función y devuelve una nueva función que tiene una salida específica en caso de que falle (parámetro \texttt{otherwise}).
+
+```{r echo=TRUE, warning=FALSE}
+possibly_read.csv <- possibly(read.csv,otherwise = data.frame())
+
+c(list.files(pattern="archivo"),"archivo_4.csv") %>%
+  tibble(archivos = .) %>%
+  mutate(contenido = map(archivos,possibly_read.csv))
+```
 
 # Resumen
 
 ### Resumen
+
+# Referencias
+
+### Referencias {.fragile}
+
+\begin{itemize}
+\item Bryan, Jenny. (2019) \textit{Purrr tutorial}. \href{https://jennybc.github.io/purrr-tutorial/index.html}{Link}.
+\item Barterm, Rebecca. (2019). \textit{Learn to purrr}. \href{http://www.rebeccabarter.com/blog/2019-08-19_purrr/}{Link}.
+\item Wickham, Hadley (2019). \textit{Advanced R -- 2nd Edition}. Capítulo 9. CRC Press. \href{https://adv-r.hadley.nz/functionals.html#functionals}{Link}.
+\item Baumer B., Kaplan D. y Horton N. (2021). \textit{Modern Data Science with R -- 2nd Edition}. Capítulo 7. CRC Press. \href{https://mdsr-book.github.io/mdsr2e/ch-iteration.html#sec:vectorized}{Link}. 
+\end{itemize}

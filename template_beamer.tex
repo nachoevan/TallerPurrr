@@ -187,7 +187,11 @@ $if(subtitle)$
 \subtitle{$subtitle$}
 $endif$
 $if(author)$
-\author{$for(author)$$author$$sep$ \and $endfor$}
+\author{\includegraphics[width=0.2\textwidth]{purrr.jpg}\\ $for(author)$$author$$sep$ \and $endfor$\\
+\institute[A]{
+Grupo de Usuaries de R en Rosario
+}
+\textit{evangelistaignacio@gmail.com}}
 $endif$
 \date{$date$}
 
