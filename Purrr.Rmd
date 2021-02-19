@@ -395,8 +395,8 @@ T4
 ### {.fragile}
 
 ```{r columnas-lista-5, echo=TRUE}
-animalitos <- list(animales = c("perro","gato","elefante","vaca"),
-               acciones = c("ladrar","maullar","barritar","mugir"),
+animalitos <- list(animales = c("perro","gato","elefante","oveja"),
+               acciones = c("ladrar","maullar","barritar","balar"),
                nombres = list(c("Pongo","Marley","Golfo"),
                               c("Pelusa","Tom"),
                               c("Tantor","Dumbo"),
@@ -978,7 +978,7 @@ c(list.files(pattern="archivo"),"archivo_4.csv") %>%
 \item Vale la pena amigarse con las listas
 \item El paquete \texttt{purrr} sirve para vectorizar operaciones
 \item El paquete \texttt{purrr} sirve para iterar
-\item En un \texttt{purrr} podemos meter cualquier cosa
+\item En un \texttt{tibble} podemos meter cualquier cosa
 \item \texttt{dplyr} + \texttt{tidyr} + \texttt{purrr} = lo que vos quieras
 \item Superioridad estética y moral de soluciones con un enfoque funcional
 \end{itemize}
